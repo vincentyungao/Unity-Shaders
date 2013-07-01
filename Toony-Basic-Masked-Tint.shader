@@ -1,7 +1,8 @@
-Shader "Custom/Basic Masked Tint" {
+Shader "Toon/Basic Masked Tint" {
 	Properties {
 		_Color ("Main Color", Color) = (.5,.5,.5,1)
-		_MainTex ("Base (RGB)", 2D) = "white" {}
+		_MaskedTint ("Masked Tint", Color) = (.5,.5,.5,1)
+		_MainTex ("Base (RGBA)", 2D) = "white" {}
 		_ToonShade ("ToonShader Cubemap(RGB)", CUBE) = "" { Texgen CubeNormal }
 	}
 
@@ -23,6 +24,7 @@ Shader "Custom/Basic Masked Tint" {
 			samplerCUBE _ToonShade;
 			float4 _MainTex_ST;
 			float4 _Color;
+			float4 _MaskedTint;
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -48,10 +50,10 @@ Shader "Custom/Basic Masked Tint" {
 			float4 frag (v2f i) : COLOR
 			{
 				float4 tex = tex2D(_MainTex, i.texcoord);
-				float4 mcol = _Color;
+				float4 mskt = _MaskedTint;
 				float4 col = _Color * tex2D(_MainTex, i.texcoord);
 				float4 cube = texCUBE(_ToonShade, i.cubenormal);
-				return float4(2.0f * cube.rgb * tex.rgb * (mcol.rgb * tex.a + (1. - tex.a)), 1);
+				return float4(2.0f * cube.rgb * col.rgb * (mskt.rgb * tex.a + (1. - tex.a)), 1);
 			}
 			ENDCG			
 		}
